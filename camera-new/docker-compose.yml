@@ -1,0 +1,19 @@
+version: '2'
+
+services:
+
+    #proxy-camera
+    proxy-camera:
+        image: example-debug:v0.0.5
+        network_mode: host
+        devices:
+            - "/dev/video0:/dev/video0"
+        ulimits:
+            # memlock: 2359296
+            memlock: 15745700
+        environment:
+            - DISPLAY=$DISPLAY
+        volumes:
+            - /tmp/.X11-unix:/tmp/.X11-unix
+        #command: "--camera=/dev/video0 --cid=111 --name=camera0 --width=2560 --height=720  --bpp=24 --freq=20 --verbose"
+        command: "--camera=/dev/video0 --cid=111 --name=camera0 --width=2560 --height=720  --bpp=24 --freq=20"

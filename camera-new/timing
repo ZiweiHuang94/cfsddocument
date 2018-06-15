@@ -1,0 +1,65 @@
+                /*
+                auto timeTrigger = [&videoStream, &sharedMemory, &VERBOSE, &frameData](){
+                    cluon::data::TimeStamp ts0 = cluon::time::now();
+                    const bool retVal = videoStream->read(frameData);
+                    cluon::data::TimeStamp ts1 = cluon::time::now();
+                    int64_t delta1 = cluon::time::deltaInMicroseconds(ts1,ts0);
+                    std::cout << "delta1 = " << delta1 << std::endl;
+                    int64_t delta2 = 0;
+                    int64_t delta3 = 0;
+                    int64_t delta4 = 0;
+                    int64_t delta5 = 0;
+                    int64_t delta6 = 0;
+                    int64_t delta7 = 0;
+                    int64_t delta8 = 0;
+                    int64_t delta9 = 0;
+                    if (retVal) {
+                        cluon::data::TimeStamp ts2 = cluon::time::now();
+                        delta2 = cluon::time::deltaInMicroseconds(ts2,ts1);
+                        std::cout << "delta2 = " << delta2 << std::endl;
+                        sharedMemory->lock();
+                        cluon::data::TimeStamp ts3 = cluon::time::now();
+                        delta3 = cluon::time::deltaInMicroseconds(ts3,ts2);
+                        std::cout << "delta3 = " << delta3 << std::endl;
+                        ::memcpy(sharedMemory->data(), reinterpret_cast<char*>(frameData.data), frameData.step * frameData.rows);
+                        cluon::data::TimeStamp ts4 = cluon::time::now();
+                        delta4 = cluon::time::deltaInMicroseconds(ts4,ts3);
+                        std::cout << "delta4 = " << delta4 << std::endl;
+                        sharedMemory->unlock();
+                        cluon::data::TimeStamp ts5 = cluon::time::now();
+                        delta5 = cluon::time::deltaInMicroseconds(ts5,ts4);
+                        std::cout << "delta5 = " << delta5 << std::endl;
+                        sharedMemory->notifyAll();
+                        cluon::data::TimeStamp ts6 = cluon::time::now();
+                        delta6 = cluon::time::deltaInMicroseconds(ts6,ts5);
+                        std::cout << "delta6 = " << delta6 << std::endl;
+                    }
+                    if (retVal && VERBOSE) {
+                        cluon::data::TimeStamp ts7 = cluon::time::now();
+                        delta7 = cluon::time::deltaInMicroseconds(ts7,ts1);
+                        std::cout << "delta7 = " << delta7 << std::endl;
+                        cv::imshow(sharedMemory->name(), frameData);
+                        cluon::data::TimeStamp ts8 = cluon::time::now();
+                        delta8 = cluon::time::deltaInMicroseconds(ts8,ts7);
+                        std::cout << "delta8 = " << delta8 << std::endl;
+                        cv::waitKey(1);
+                        cluon::data::TimeStamp ts9 = cluon::time::now();
+                        delta9 = cluon::time::deltaInMicroseconds(ts9,ts8);
+                        std::cout << "delta9 = " << delta9 << std::endl;
+                    }
+                    cluon::data::TimeStamp ts10 = cluon::time::now();
+                    int64_t delta11 = cluon::time::deltaInMicroseconds(ts10,ts0);
+                    std::cout << "delta11 = " << delta11 << std::endl;
+                    std::cout << "percentage" << std::endl;
+                    std::cout << "delta1  " << (float)delta1/(float)delta11 << std::endl;
+                    std::cout << "delta2  " << (float)delta2/(float)delta11 << std::endl;
+                    std::cout << "delta3  " << (float)delta3/(float)delta11 << std::endl;
+                    std::cout << "delta4  " << (float)delta4/(float)delta11 << std::endl;
+                    std::cout << "delta5  " << (float)delta5/(float)delta11 << std::endl;
+                    std::cout << "delta6  " << (float)delta6/(float)delta11 << std::endl;
+                    std::cout << "delta7  " << (float)delta7/(float)delta11 << std::endl;
+                    std::cout << "delta8  " << (float)delta8/(float)delta11 << std::endl;
+                    std::cout << "delta9  " << (float)delta9/(float)delta11 << std::endl;
+                    return retVal && isRunning;
+                };
+                */

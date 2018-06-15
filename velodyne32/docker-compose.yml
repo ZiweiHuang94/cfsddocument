@@ -1,0 +1,28 @@
+version: '2'
+
+services:
+    #proxy-velodyne16
+    opendlv-device-lidar-vlp16:
+        image: chalmersrevere/opendlv-device-lidar-vlp16-multi:v0.0.6
+        network_mode: "host"
+        volumes:
+            - .:/opt/opendlv.data
+        working_dir: "/opt/opendlv.data"
+        command: "opendlv-device-lidar-vlp16 --vlp16_ip=0.0.0.0 --vlp16_port=2368 --cid=${CID}"
+
+    # #signal-viewer
+    signal-viewer:
+        image: chalmersrevere/opendlv-signal-viewer-multi:v0.0.4
+        network_mode: "host"
+        ports:
+            - "8080:8080" 
+        command: "--cid=${CID}"
+
+    # # # #vehicle-viewer
+    vehicle-viewer:
+        image: chalmersrevere/opendlv-vehicle-view-multi:v0.0.8
+        network_mode: "host"
+        ports:
+            - "8081:8081" 
+        command: "--cid=${CID}"
+
