@@ -1,0 +1,8 @@
+echo 'SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="a0:ce:c8:0c:a4:df", NAME="usb0"' > /etc/udev/rules.d/10-network.rules
+
+iptables -t nat -A POSTROUTING -o wan -j MASQUERADE
+iptables -A FORWARD -i wan -o lan -m state --state RELATED,ESTABLISHED -j ACCEPT
+iptables -A FORWARD -i lan -o wan -j ACCEPT
+
+iptables-save > /etc/iptables/iptables.rules
+
