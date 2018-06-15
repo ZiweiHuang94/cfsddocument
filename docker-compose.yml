@@ -1,0 +1,158 @@
+version: '2'
+
+services:
+    odsupercomponent:
+        image: ${IMAGE}
+        network_mode: "host"
+        volumes:
+        - .:/opt/opendlv.data
+        command: "/opt/od4/bin/odsupercomponent --cid=${CID} --verbose=1 --configuration=/opt/opendlv.data/configuration"
+
+    # # # #proxy-velodyne16
+    opendlv-device-lidar-vlp16:
+        image: chalmersrevere/opendlv-device-lidar-vlp16-multi:v0.0.6
+        network_mode: "host"
+        volumes:
+            - .:/opt/opendlv.data
+        working_dir: "/opt/opendlv.data"
+        command: "opendlv-device-lidar-vlp16 --vlp16_ip=0.0.0.0 --vlp16_port=2368 --cid=${CID}"
+
+
+    # #proxy-velodyne16
+    # proxy-velodyne16:
+    #    image: ${IMAGE}
+    #    network_mode: "host"
+    #    volumes:
+    #        - .:/opt/opendlv.data
+    #    ipc: host
+    #    user: root
+    #    working_dir: "/opt/opendlv.data"
+    #    depends_on:
+    #        - odsupercomponent
+    #    command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-velodyne16 --cid=${CID}"
+
+    # #proxy-camera
+    # opendlv-device-camera-opencv:latest use v0.0.90
+    opendlv-device-camera-opencv:
+        image: opendlv-device-camera-opencv:latest
+        network_mode: host
+        group_add:
+            - video
+        devices:
+            - "/dev/video0:/dev/video0"
+        environment:
+            - DISPLAY=$DISPLAY
+        volumes:
+            - /tmp/.X11-unix:/tmp/.X11-unix
+            - /dev/shm:/dev/shm
+        #cpuset: 0,0
+        #user: root
+        privileged: true
+        ulimits:
+          memlock:
+            soft: 5600000
+            hard: 5600000
+        command: "/usr/bin/opendlv-device-camera-opencv --camera=/dev/video0 --bgr2rgb --cid=${CID} --name=camera0 --width=2560 --height=720 --bpp=24 --freq=30"
+        #command: "--camera=/dev/video0 --bgr2rgb --cid=${CID} --name=camera0 --width=1920 --height=1080 --bpp=24 --freq=30"
+        # command: "nice -n -19 /usr/bin/opendlv-device-camera-opencv --camera=/dev/video0 --bgr2rgb --cid=${CID} --name=camera0 --width=2560 --height=720 --bpp=24 --freq=30"
+        # command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-camera --cid=${CID}  --freq=20 --realtime=20"
+
+
+    # #proxy-ellipse2n
+    # # image need to be built locally
+    # # image imu:latest is using libcluon v0.0.90
+    # opendlv-proxy-ellipse2n:
+    #     image: imu:latest
+    #     network_mode: "host"
+    #     devices:
+    #         - "/dev/ttyUSB0:/dev/ttyUSB0"
+    #     command: "opendlv-proxy-ellipse2n --cid=${CID} --id=112"
+
+
+    #recorder
+    # odrecorderh264:
+    #     image: ${IMAGE}
+    #     depends_on:
+    #         - odsupercomponent
+    #         - proxy-camera
+    #         - proxy-velodyne16
+    #         - proxy-ellipse2n
+    #     volumes:
+    #         - ~/recordings:/opt/recordings
+    #     user: root
+    #     network_mode: host
+    #     ipc: host
+    #     working_dir: "/opt/recordings"
+    #     command: "/opt/od4/bin/odrecorderh264 --cid=${CID}"
+
+
+    #signal-viewer
+    # signal-viewer:
+    #     image: chalmersrevere/opendlv-signal-viewer-multi:v0.0.4
+    #     network_mode: "host"
+    #     ports:
+    #         - "8080:8080" 
+    #     command: "--cid=${CID}"
+
+    # # # #vehicle-viewer
+    # vehicle-viewer:
+    #     image: chalmersrevere/opendlv-vehicle-view-multi:v0.0.8
+    #     network_mode: "host"
+    #     ports:
+    #         - "8081:8081" 
+    #     command: "--cid=${CID}"
+
+    # odcockpit:
+    #    image: ${IMAGE}
+    #    network_mode: host
+    #    environment:
+    #    - DISPLAY=$DISPLAY
+    #    volumes:
+    #    - /tmp/.X11-unix:/tmp/.X11-unix
+    #    #- .:/opt/opendlv.data
+    #    - ~/opendlv/opendlv.cfsd18/code/logic-cfsd18/perception/detectconelane/src:/opt/testdata
+    #    - ~/recordings:/opt/Recordings
+    #    ipc: host
+    #    user: root
+    #    depends_on:
+    #        - odsupercomponent
+    #    command: "/opt/od4/bin/odcockpit --cid=${CID}" 
+    opendlv-sim-global:
+        image: chalmersrevere/opendlv-sim-global-amd64:v0.0.5
+        network_mode: "host"
+        command: "/usr/bin/opendlv-sim-global --cid=${CID} --freq=50 --frame-id=0 --x=0 --y=1.5 --yaw=-2.3"
+
+
+    # microservice for ...
+    opendlv-logic-cfsd18-perception-detectconelane:
+        image: ${IMAGE}
+        network_mode: "host"
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv.cfsd18/bin/opendlv-logic-cfsd18-perception-detectconelane --cid=${CID} --verbose=1 --id=1"
+
+    # microservice for ...
+    opendlv-sim-cfsd18-perception-detectcone:
+        image: ${IMAGE}
+        network_mode: "host"
+        depends_on:
+            - odsupercomponent
+        volumes:
+        - .:/opt/opendlv.data
+        command: "/opt/opendlv.cfsd18/bin/opendlv-sim-cfsd18-perception-detectcone --cid=${CID} --verbose=1 --id=1 --freq=20"
+
+    # microservice for ...
+    opendlv-logic-cfsd18-cognition-track:
+        image: ${IMAGE}
+        network_mode: "host"
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv.cfsd18/bin/opendlv-logic-cfsd18-cognition-track --cid=${CID} --verbose=1 --id=1"
+
+    opendlv-sim-lynx-vehicle:
+        image: seresearch/opendlv-lynx-on-opendlv-core-on-opendavinci-on-base:latest
+        network_mode: "host"
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv.lynx/bin/opendlv-sim-lynx-bicyclemodel --cid=${CID} --freq=100"
+
